@@ -36,7 +36,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Skills53dicTheme {
-                SplashScreen()
+                Scaffold (
+                ) { innerPadding ->
+                    SplashScreen()
+                }
             }
         }
     }
