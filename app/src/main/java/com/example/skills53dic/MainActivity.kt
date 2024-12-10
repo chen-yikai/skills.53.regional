@@ -7,9 +7,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.skills53dic.components.TopBar
 import com.example.skills53dic.screens.Home
 import com.example.skills53dic.ui.theme.Skills53dicTheme
 import kotlinx.coroutines.delay
@@ -36,10 +43,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Skills53dicTheme {
-                Scaffold (
-                ) { innerPadding ->
-                    SplashScreen()
-                }
+                SplashScreen()
             }
         }
     }
@@ -49,9 +53,21 @@ class MainActivity : ComponentActivity() {
 fun NavHoster() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "home") {
-        composable("home") {
-            Home()
+    Scaffold(modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
+        topBar = {
+            TopBar()
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            NavHost(navController = navController, startDestination = "home") {
+                composable("home") {
+                    Home()
+                }
+            }
         }
     }
 }
@@ -61,7 +77,7 @@ fun NavHoster() {
 fun SplashScreen() {
     var showSplashScreen by rememberSaveable { mutableStateOf(true) }
     LaunchedEffect(Unit) {
-        delay(2000)
+        delay(0)
         showSplashScreen = false
     }
     if (showSplashScreen) {
