@@ -45,6 +45,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.skills53dic.MediaCenterDetailViewModel
 import com.example.skills53dic.R
 import com.example.skills53dic.components.BlackText
 import com.example.skills53dic.components.ColorBlack
@@ -52,14 +56,15 @@ import com.example.skills53dic.components.ColorBlue
 import com.example.skills53dic.components.ColorGreen
 import com.example.skills53dic.components.LightGrayText
 import com.google.gson.Gson
+import kotlinx.coroutines.delay
 
-@Preview(showBackground = true)
 @Composable
-fun Home() {
+fun Home(nav: NavController, mediaCenterDetailViewModel: MediaCenterDetailViewModel) {
+
     var scrollState = rememberScrollState()
     Column(modifier = Modifier.verticalScroll(scrollState)) {
         Gallery()
-        MediaCenter()
+        MediaCenter(nav, mediaCenterDetailViewModel)
         TicketInfo()
     }
 }
@@ -101,9 +106,7 @@ fun TicketInfo() {
                         colors = ButtonDefaults.buttonColors(Color.Transparent),
                         modifier = Modifier
                             .border(
-                                1.dp,
-                                ColorBlack,
-                                RoundedCornerShape(100)
+                                1.dp, ColorBlack, RoundedCornerShape(100)
                             )
                             .size(100.dp, 40.dp)
                     ) {
@@ -116,15 +119,16 @@ fun TicketInfo() {
     }
 }
 
-@Preview(showBackground = true)
+data class MediaCenter(
+    val title: String, val dateTime: String, val hall: List<String>, val content: String
+)
+
 @Composable
-fun MediaCenter() {
+fun MediaCenter(
+    nav: NavController,
+    viewModel: MediaCenterDetailViewModel
+) {
     val context = LocalContext.current
-
-    data class MediaCenter(
-        val title: String, val dateTime: String, val hall: List<String>, val content: String
-    )
-
     val content = context.assets.open("media_center.json").bufferedReader().use { it.readText() }
     val mediaCenter = Gson().fromJson(content, Array<MediaCenter>::class.java).toList()
 
@@ -142,7 +146,8 @@ fun MediaCenter() {
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .clickable {
-
+                        viewModel.setData(it)
+                        nav.navigate("media_center_detail")
                     }) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
