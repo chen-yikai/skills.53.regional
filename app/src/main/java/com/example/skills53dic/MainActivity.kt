@@ -42,9 +42,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Skills53dicTheme {
-                SplashScreen()
-            }
+            SplashScreen()
         }
     }
 }
