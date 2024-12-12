@@ -54,6 +54,7 @@ fun DrawerContent(drawerState: DrawerState) {
                 }
                 if (navlinks.sub.isNotEmpty()) {
                     Column {
+
                         navlinks.sub.forEach { subitem ->
                             Text("${subitem.title}")
                         }
