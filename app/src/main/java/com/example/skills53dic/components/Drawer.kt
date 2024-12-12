@@ -73,11 +73,13 @@ fun DrawerContent(drawerState: DrawerState, nav: NavController) {
                     )
                     Sw(5.dp)
                     TextButton(onClick = {
-                        nav.navigate(it.route)
-                        scope.launch {
-                            delay(200)
-                            drawerState.apply {
-                                close()
+                        if (it.route.isNotEmpty()) {
+                            nav.navigate(it.route)
+                            scope.launch {
+                                delay(200)
+                                drawerState.apply {
+                                    close()
+                                }
                             }
                         }
                     }) {
@@ -96,11 +98,13 @@ fun DrawerContent(drawerState: DrawerState, nav: NavController) {
                                 )
                                 Sw(5.dp)
                                 TextButton(onClick = {
-                                    nav.navigate(it.route)
-                                    scope.launch {
-                                        delay(200)
-                                        drawerState.apply {
-                                            close()
+                                    if (it.route.isNotEmpty()) {
+                                        nav.navigate(it.route)
+                                        scope.launch {
+                                            delay(200)
+                                            drawerState.apply {
+                                                close()
+                                            }
                                         }
                                     }
                                 }) {
