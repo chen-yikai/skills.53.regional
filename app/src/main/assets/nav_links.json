@@ -4,32 +4,37 @@
     "sub": [
       {
         "title": "經營者",
-        "route": ""
+        "route": "about_operator"
       },
       {
         "title": "展館介紹",
-        "route": ""
+        "route": "about_info"
       }
     ]
   },
   {
     "title": "樓層立體圖",
-    "route": ""
+    "route": "",
+    "sub": []
   },
   {
     "title": "公共藝術",
-    "route": ""
+    "route": "",
+    "sub": []
   },
   {
     "title": "聯絡我們",
-    "route": ""
+    "route": "",
+    "sub": []
   },
   {
     "title": "全部票卡",
-    "route": ""
+    "route": "",
+    "sub": []
   },
   {
     "title": "主畫面",
-    "route": "home"
+    "route": "home",
+    "sub": []
   }
 ]

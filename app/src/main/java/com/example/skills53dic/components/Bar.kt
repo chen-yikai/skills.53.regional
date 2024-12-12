@@ -2,6 +2,7 @@ package com.example.skills53dic.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -21,12 +22,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.skills53dic.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun TopBar(scope:CoroutineScope,drawerState:DrawerState) {
+fun TopBar(scope: CoroutineScope, drawerState: DrawerState, nav: NavController) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -51,7 +53,11 @@ fun TopBar(scope:CoroutineScope,drawerState:DrawerState) {
         Image(
             painter = painterResource(id = R.drawable.horizontal_logo),
             contentDescription = "App Logo",
-            modifier = Modifier.align(Alignment.Center) // Align to center
+            modifier = Modifier
+                .align(Alignment.Center)
+                .clickable {
+                    nav.navigate("home")
+                }
         )
     }
 }

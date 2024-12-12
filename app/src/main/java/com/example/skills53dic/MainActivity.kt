@@ -1,5 +1,6 @@
 package com.example.skills53dic
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -33,13 +34,17 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.skills53dic.components.DrawerContent
 import com.example.skills53dic.components.TopBar
+import com.example.skills53dic.screens.AboutInfo
+import com.example.skills53dic.screens.AboutOperator
 import com.example.skills53dic.screens.Home
 import com.example.skills53dic.screens.MediaCenterDetail
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,33 +57,47 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun NavHoster(mediaCenterDetailViewModel: MediaCenterDetailViewModel = viewModel()) {
+fun NavHoster(
+    mediaCenterDetailViewModel: MediaCenterDetailViewModel = viewModel(),
+) {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
 
-    NavHost(navController = navController, startDestination = "home") {
-        composable("home") {
-            ModalNavigationDrawer(
-                drawerState = drawerState,
-                drawerContent = { DrawerContent(drawerState) }
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = { DrawerContent(drawerState, navController) }
+    ) {
+        Scaffold(
+            modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
+            topBar = {
+                if (currentRoute != "media_center_detail") {
+                    TopBar(scope, drawerState,navController)
+                }
+            }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
             ) {
-                Scaffold(
-                    modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
-                    topBar = { TopBar(scope,drawerState) }
-                ) { innerPadding ->
-                    Box(
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize()
-                    ) {
+                NavHost(navController = navController, startDestination = "home") {
+                    composable("home") {
                         Home(navController, mediaCenterDetailViewModel)
+                    }
+                    composable("about_operator") {
+                        AboutOperator()
+                    }
+                    composable("about_info") {
+                        AboutInfo()
+                    }
+                    composable("media_center_detail") {
+                        MediaCenterDetail(navController, mediaCenterDetailViewModel)
                     }
                 }
             }
-        }
-        composable("media_center_detail") {
-            MediaCenterDetail(navController, mediaCenterDetailViewModel)
         }
     }
 }
