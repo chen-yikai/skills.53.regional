@@ -54,6 +54,7 @@ fun MediaCenterDetail(
         topBar = {
             Box(modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 15.dp)
                 .background(Color.White)) {
                 IconButton(onClick = {
                     nav.popBackStack()

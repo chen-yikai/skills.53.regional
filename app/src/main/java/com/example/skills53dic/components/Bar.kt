@@ -10,19 +10,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.RememberObserver
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.skills53dic.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
-fun TopBar() {
+fun TopBar(scope:CoroutineScope,drawerState:DrawerState) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -30,7 +34,13 @@ fun TopBar() {
             .height(50.dp)
     ) {
         IconButton(
-            onClick = { },
+            onClick = {
+                scope.launch {
+                    drawerState.apply {
+                        if (isClosed) open() else close()
+                    }
+                }
+            },
             modifier = Modifier.align(Alignment.CenterStart) // Align to start (left)
         ) {
             Icon(

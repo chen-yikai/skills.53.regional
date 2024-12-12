@@ -60,8 +60,8 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun Home(nav: NavController, mediaCenterDetailViewModel: MediaCenterDetailViewModel) {
-
     var scrollState = rememberScrollState()
+
     Column(modifier = Modifier.verticalScroll(scrollState)) {
         Gallery()
         MediaCenter(nav, mediaCenterDetailViewModel)
