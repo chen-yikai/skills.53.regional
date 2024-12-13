@@ -50,6 +50,7 @@ import com.example.skills53dic.screens.AboutOperator
 import com.example.skills53dic.screens.Floor3d
 import com.example.skills53dic.screens.Home
 import com.example.skills53dic.screens.MediaCenterDetail
+import com.example.skills53dic.screens.PublicArt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -91,6 +92,9 @@ fun NavHoster(
                     composable("home") {
                         Home(navController, mediaCenterDetailViewModel)
                     }
+                    composable("media_center_detail") {
+                        MediaCenterDetail(navController, mediaCenterDetailViewModel)
+                    }
                     composable("about_operator") {
                         AboutOperator()
                     }
@@ -100,8 +104,8 @@ fun NavHoster(
                     composable("floor_3d") {
                         Floor3d()
                     }
-                    composable("media_center_detail") {
-                        MediaCenterDetail(navController, mediaCenterDetailViewModel)
+                    composable("public_art") {
+                        PublicArt()
                     }
                 }
             }

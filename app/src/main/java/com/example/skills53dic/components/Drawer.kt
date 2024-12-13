@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
@@ -37,6 +38,7 @@ import com.google.gson.Gson
 import com.example.skills53dic.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.nio.file.WatchEvent
 
 data class SubNavLinksList(
     val title: String,
@@ -45,7 +47,9 @@ data class SubNavLinksList(
 
 data class NavLinksList(
     val title: String, val route: String, val sub: List<SubNavLinksList> = emptyList()
-) {}
+) {
+    constructor() : this("", "", listOf())
+}
 
 @Composable
 fun DrawerContent(drawerState: DrawerState, nav: NavController) {
@@ -53,7 +57,6 @@ fun DrawerContent(drawerState: DrawerState, nav: NavController) {
     val scope = rememberCoroutineScope()
     val navLinksJson = context.assets.open("nav_links.json").bufferedReader().use { it.readText() }
     val navLinks = Gson().fromJson(navLinksJson, Array<NavLinksList>::class.java).toList()
-
     Column(
         modifier = Modifier
             .fillMaxHeight()

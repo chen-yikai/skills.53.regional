@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.foundation.layout.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -61,4 +62,5 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")
     implementation("com.google.code.gson:gson:2.8.9")
     implementation("androidx.webkit:webkit:1.8.0")
+    implementation("io.coil-kt:coil:1.4.0")
 }

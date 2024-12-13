@@ -15,27 +15,22 @@
   },
   {
     "title": "樓層立體圖",
-    "route": "floor_3d",
-    "sub": []
+    "route": "floor_3d"
   },
   {
     "title": "公共藝術",
-    "route": "",
-    "sub": []
+    "route": "public_art"
   },
   {
     "title": "聯絡我們",
-    "route": "",
-    "sub": []
+    "route": "contact"
   },
   {
     "title": "全部票卡",
-    "route": "",
-    "sub": []
+    "route": ""
   },
   {
     "title": "主畫面",
-    "route": "home",
-    "sub": []
+    "route": "home"
   }
 ]
