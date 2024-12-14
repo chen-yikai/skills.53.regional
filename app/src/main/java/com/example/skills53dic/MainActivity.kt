@@ -47,6 +47,7 @@ import com.example.skills53dic.components.DrawerContent
 import com.example.skills53dic.components.TopBar
 import com.example.skills53dic.screens.AboutInfo
 import com.example.skills53dic.screens.AboutOperator
+import com.example.skills53dic.screens.Contact
 import com.example.skills53dic.screens.Floor3d
 import com.example.skills53dic.screens.Home
 import com.example.skills53dic.screens.MediaCenterDetail
@@ -103,6 +104,9 @@ fun NavHoster(
                     }
                     composable("floor_3d") {
                         Floor3d()
+                    }
+                    composable("contact") {
+                        Contact()
                     }
                     composable("public_art") {
                         PublicArt()
