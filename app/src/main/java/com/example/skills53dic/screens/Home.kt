@@ -34,6 +34,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +59,7 @@ import com.example.skills53dic.components.ColorBlack
 import com.example.skills53dic.components.ColorBlue
 import com.example.skills53dic.components.ColorGreen
 import com.example.skills53dic.components.LightGrayText
+import com.example.skills53dic.components.SafeColumn
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
 
@@ -72,12 +77,7 @@ fun Home(nav: NavController, mediaCenterDetailViewModel: MediaCenterDetailViewMo
 @Preview(showBackground = true)
 @Composable
 fun TicketInfo() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .padding(top = 15.dp)
-    ) {
+    SafeColumn {
         BlackText("購票資訊", 20.sp, FontWeight.Bold)
         Spacer(modifier = Modifier.height(10.dp))
         Box(
@@ -132,12 +132,7 @@ fun MediaCenter(
     val content = context.assets.open("media_center.json").bufferedReader().use { it.readText() }
     val mediaCenter = Gson().fromJson(content, Array<MediaCenter>::class.java).toList()
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .padding(top = 15.dp)
-    ) {
+    SafeColumn {
         BlackText(text = "媒體中心", 20.sp, FontWeight.Bold)
         Spacer(modifier = Modifier.height(5.dp))
         mediaCenter.forEach {

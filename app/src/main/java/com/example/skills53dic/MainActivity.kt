@@ -80,9 +80,7 @@ fun NavHoster(
         gesturesEnabled = false
     ) {
         Scaffold(modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars), topBar = {
-            if (currentRoute != "media_center_detail") {
-                TopBar(scope, drawerState, navController)
-            }
+            TopBar(scope, drawerState, navController)
         }) { innerPadding ->
             Box(
                 modifier = Modifier
@@ -106,7 +104,7 @@ fun NavHoster(
                         Floor3d()
                     }
                     composable("contact") {
-                        Contact()
+                        Contact(navController)
                     }
                     composable("public_art") {
                         PublicArt()
