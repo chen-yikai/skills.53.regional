@@ -70,19 +70,20 @@ fun ErrorToast(message: String = "Hello", delay: Int = 2000) {
 @Preview(showBackground = true)
 @Composable
 fun Input(
-    value: String = "",
+    value: MutableState<String>,
     label: String = "Hello",
     fontSize: Int = 15,
     padding: Int = 10,
     singleLine: Boolean = true,
-    onValueChange: (String) -> Unit = {}
 ) {
     Column(modifier = Modifier.padding(bottom = padding.dp)) {
         LightGrayText(label, 13.sp)
         Sh(3.dp)
         BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
+            value = value.value,
+            onValueChange = {
+                value.value = it
+            },
             textStyle = TextStyle.Default.copy(fontSize = fontSize.sp),
             singleLine = singleLine,
             maxLines = 10,

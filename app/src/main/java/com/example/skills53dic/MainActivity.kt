@@ -47,11 +47,13 @@ import com.example.skills53dic.components.DrawerContent
 import com.example.skills53dic.components.TopBar
 import com.example.skills53dic.screens.AboutInfo
 import com.example.skills53dic.screens.AboutOperator
+import com.example.skills53dic.screens.AddTicket
 import com.example.skills53dic.screens.Contact
 import com.example.skills53dic.screens.Floor3d
 import com.example.skills53dic.screens.Home
 import com.example.skills53dic.screens.MediaCenterDetail
 import com.example.skills53dic.screens.PublicArt
+import com.example.skills53dic.screens.Tickets
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -105,6 +107,12 @@ fun NavHoster(
                     }
                     composable("contact") {
                         Contact(navController)
+                    }
+                    composable("tickets") {
+                        Tickets()
+                    }
+                    composable("add_ticket") {
+                        AddTicket()
                     }
                     composable("public_art") {
                         PublicArt()
