@@ -99,9 +99,34 @@ fun ContactInput(
         Text(errorMessage, color = Color.Red)
     }
 }
-@Composable
-fun AddTicket() {
-    Column(modifier =Modifier.padding(10.dp)) {
 
+@Composable
+fun AddTicketInput(
+    value: MutableState<String>,
+    label: String = "Hello",
+    borderColor: Color = ColorGreen,
+    errorMessage: String = "",
+    fontSize: Int = 15,
+    singleLine: Boolean = true,
+) {
+    Column() {
+        LightGrayText(label, 13.sp)
+        Sh(3.dp)
+        BasicTextField(
+            value = value.value,
+            onValueChange = { value.value = it },
+            textStyle = TextStyle.Default.copy(fontSize = fontSize.sp),
+            singleLine = singleLine,
+            maxLines = 10,
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    1.dp,
+                    if (errorMessage.isEmpty()) borderColor else Color.Red,
+                    RoundedCornerShape(10.dp)
+                )
+                .padding(10.dp)
+        )
+        Text(errorMessage, color = Color.Red)
     }
 }

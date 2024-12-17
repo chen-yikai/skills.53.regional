@@ -51,8 +51,10 @@ fun getDataBase(context: Context): TicketsDataBase {
 class TicketsViewModel(private val db: TicketsDataBase) : ViewModel() {
     val tickets = mutableStateListOf<TicketsSchema>()
 
-    suspend fun add(tickets: TicketsSchema) {
-        db.TicketsDao().insert(tickets)
+    fun add(tickets: TicketsSchema) {
+        viewModelScope.launch {
+            db.TicketsDao().insert(tickets)
+        }
     }
 
     init {

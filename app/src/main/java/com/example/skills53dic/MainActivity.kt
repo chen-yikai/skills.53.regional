@@ -109,10 +109,10 @@ fun NavHoster(
                         Contact(navController)
                     }
                     composable("tickets") {
-                        Tickets()
+                        Tickets(navController)
                     }
                     composable("add_ticket") {
-                        AddTicket()
+                        AddTicket(navController)
                     }
                     composable("public_art") {
                         PublicArt()
