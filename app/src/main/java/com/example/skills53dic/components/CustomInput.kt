@@ -99,3 +99,9 @@ fun ContactInput(
         Text(errorMessage, color = Color.Red)
     }
 }
+@Composable
+fun AddTicket() {
+    Column(modifier =Modifier.padding(10.dp)) {
+
+    }
+}

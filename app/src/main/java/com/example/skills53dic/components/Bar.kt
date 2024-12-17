@@ -45,7 +45,7 @@ fun TopBar(scope: CoroutineScope, drawerState: DrawerState, nav: NavController) 
             .fillMaxWidth()
             .background(Color.White)
             .animateContentSize()
-            .height(if (nav.currentDestination?.route == "media_center_detail") 0.dp else 50.dp)
+            .height(if (currentRoute == "media_center_detail" || currentRoute == "add_ticket") 0.dp else 50.dp)
     ) {
         IconButton(
             modifier = Modifier.align(Alignment.TopStart),
