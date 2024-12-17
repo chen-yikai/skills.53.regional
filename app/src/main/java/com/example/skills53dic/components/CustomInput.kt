@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -67,30 +68,34 @@ fun ErrorToast(message: String = "Hello", delay: Int = 2000) {
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun Input(
+fun ContactInput(
     value: MutableState<String>,
     label: String = "Hello",
+    borderColor: Color = ColorGreen,
+    errorMessage: String = "",
     fontSize: Int = 15,
-    padding: Int = 10,
     singleLine: Boolean = true,
+    onValueChange: (String) -> Unit = {},
 ) {
-    Column(modifier = Modifier.padding(bottom = padding.dp)) {
+    Column() {
         LightGrayText(label, 13.sp)
         Sh(3.dp)
         BasicTextField(
             value = value.value,
-            onValueChange = {
-                value.value = it
-            },
+            onValueChange = onValueChange,
             textStyle = TextStyle.Default.copy(fontSize = fontSize.sp),
             singleLine = singleLine,
             maxLines = 10,
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.dp, ColorGreen, RoundedCornerShape(10.dp))
+                .border(
+                    1.dp,
+                    if (errorMessage.isEmpty()) borderColor else Color.Red,
+                    RoundedCornerShape(10.dp)
+                )
                 .padding(10.dp)
         )
+        Text(errorMessage, color = Color.Red)
     }
 }
