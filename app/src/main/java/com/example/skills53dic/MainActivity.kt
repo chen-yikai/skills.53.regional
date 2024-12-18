@@ -51,6 +51,7 @@ import com.example.skills53dic.db.getDataBase
 import com.example.skills53dic.screens.AboutInfo
 import com.example.skills53dic.screens.AboutOperator
 import com.example.skills53dic.screens.AddTicket
+import com.example.skills53dic.screens.BuyTickets
 import com.example.skills53dic.screens.Contact
 import com.example.skills53dic.screens.Floor3d
 import com.example.skills53dic.screens.Home
@@ -119,6 +120,9 @@ fun NavHoster(
                     }
                     composable("add_ticket") {
                         AddTicket(navController, ticketsViewModel)
+                    }
+                    composable("buy_tickets") {
+                        BuyTickets()
                     }
                     composable("public_art") {
                         PublicArt()

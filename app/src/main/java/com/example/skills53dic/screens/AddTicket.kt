@@ -159,7 +159,6 @@ fun AddTicket(
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun AddTicketTopBar(nav: NavController = rememberNavController()) {
