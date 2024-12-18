@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,6 +46,8 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.skills53dic.components.DrawerContent
 import com.example.skills53dic.components.TopBar
+import com.example.skills53dic.db.TicketsViewModel
+import com.example.skills53dic.db.getDataBase
 import com.example.skills53dic.screens.AboutInfo
 import com.example.skills53dic.screens.AboutOperator
 import com.example.skills53dic.screens.AddTicket
@@ -74,8 +77,11 @@ fun NavHoster(
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = currentBackStackEntry?.destination?.route
+    val currentBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentDestination = currentBackStackEntry.value?.destination
+    val DataBase = getDataBase(LocalContext.current)
+    val ticketsViewModel = TicketsViewModel(DataBase)
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = { DrawerContent(drawerState, navController) },
@@ -109,10 +115,10 @@ fun NavHoster(
                         Contact(navController)
                     }
                     composable("tickets") {
-                        Tickets(navController)
+                        Tickets(navController, ticketsViewModel)
                     }
                     composable("add_ticket") {
-                        AddTicket(navController)
+                        AddTicket(navController, ticketsViewModel)
                     }
                     composable("public_art") {
                         PublicArt()

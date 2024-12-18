@@ -2,6 +2,7 @@ package com.example.skills53dic.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -20,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,28 +37,27 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.skills53dic.AddTicketViewModel
 import com.example.skills53dic.components.SafeColumn
 import com.example.skills53dic.R
 import com.example.skills53dic.components.AddTicketInput
 import com.example.skills53dic.components.BlueText
 import com.example.skills53dic.components.ColorBlue
-import com.example.skills53dic.components.ContactInput
 import com.example.skills53dic.components.CustomButton
 import com.example.skills53dic.components.CustomTextButton
 import com.example.skills53dic.components.LightGrayText
 import com.example.skills53dic.components.Sh
 import com.example.skills53dic.components.Sw
+import com.example.skills53dic.db.TicketsSchema
+import com.example.skills53dic.db.TicketsViewModel
 
 @Preview(showBackground = true)
 @Composable
-fun AddTicket(nav: NavController = rememberNavController()) {
-    var type = remember { mutableStateOf("") }
-    var name = remember { mutableStateOf("") }
-    var email = remember { mutableStateOf("") }
-    var phone = remember { mutableStateOf("") }
-    var date = remember { mutableStateOf("") }
-    var ticketId = remember { mutableStateOf("") }
-    var price = remember { mutableStateOf("") }
+fun AddTicket(
+    nav: NavController = rememberNavController(),
+    db: TicketsViewModel = viewModel(),
+    viewModel: AddTicketViewModel = viewModel()
+) {
     val scrollState = rememberScrollState()
 
     Scaffold(topBar = {
@@ -75,6 +76,9 @@ fun AddTicket(nav: NavController = rememberNavController()) {
                         .size((LocalConfiguration.current.screenWidthDp * 0.5).dp)
                         .border(1.dp, Color(0xFFa3a3a3), RoundedCornerShape(10.dp))
                         .background(Color(0xFFf7f7f7))
+                        .clickable {
+
+                        }
                 ) {
                     Column(modifier = Modifier.align(Alignment.Center)) {
                         Icon(
@@ -89,13 +93,13 @@ fun AddTicket(nav: NavController = rememberNavController()) {
                     }
                 }
                 Sh(20.dp)
-                AddTicketInput(type, "票種")
-                AddTicketInput(name, "姓名")
-                AddTicketInput(email, "Email")
-                AddTicketInput(phone, "電話")
-                AddTicketInput(date, "日期")
-                AddTicketInput(ticketId, "票卡號碼")
-                AddTicketInput(price, "價格")
+                AddTicketInput(viewModel.type, "票種")
+                AddTicketInput(viewModel.name, "姓名")
+                AddTicketInput(viewModel.email, "Email")
+                AddTicketInput(viewModel.phone, "電話")
+                AddTicketInput(viewModel.date, "日期")
+                AddTicketInput(viewModel.ticketId, "票卡號碼")
+                AddTicketInput(viewModel.price, "價格")
                 Row(
                     modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
                 ) {
@@ -104,6 +108,17 @@ fun AddTicket(nav: NavController = rememberNavController()) {
                     }
                     Sw(5.dp)
                     CustomButton("匯入") {
+                        db.add(
+                            TicketsSchema(
+                                id = viewModel.ticketId.value,
+                                type = viewModel.type.value,
+                                name = viewModel.name.value,
+                                email = viewModel.email.value,
+                                phone = viewModel.phone.value,
+                                date = viewModel.date.value,
+                                price = viewModel.price.value,
+                            )
+                        )
                         nav.navigate("tickets")
                     }
                 }

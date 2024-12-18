@@ -2,7 +2,6 @@ package com.example.skills53dic.db
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.ColumnInfo
@@ -16,10 +15,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import kotlinx.coroutines.launch
 
-@Entity(tableName = "data")
+@Entity(tableName = "tickets")
 data class TicketsSchema(
     @PrimaryKey val id: String,
-    @ColumnInfo(name = "title", defaultValue = "2022第41屆新一代設計展") val title: String,
+    val title: String = "2022第41屆新一代設計展",
     val type: String,
     val name: String,
     val email: String,
@@ -33,32 +32,34 @@ interface TicketsDao {
     @Insert
     suspend fun insert(tickets: TicketsSchema)
 
-    @Query("SELECT * FROM data")
+    @Query("SELECT * FROM tickets")
     suspend fun getAll(): List<TicketsSchema>
 }
 
 @Database(entities = [TicketsSchema::class], version = 1)
-abstract class TicketsDataBase : RoomDatabase() {
+abstract class DataBase : RoomDatabase() {
     abstract fun TicketsDao(): TicketsDao
 }
 
-fun getDataBase(context: Context): TicketsDataBase {
+fun getDataBase(context: Context): DataBase {
+//    context.deleteDatabase("db")
     return Room.databaseBuilder(
-        context.applicationContext, TicketsDataBase::class.java, "tickets_db"
+        context.applicationContext, DataBase::class.java, "db"
     ).build()
 }
 
-class TicketsViewModel(private val db: TicketsDataBase) : ViewModel() {
+class TicketsViewModel(private val db: DataBase) : ViewModel() {
     val tickets = mutableStateListOf<TicketsSchema>()
-
-    fun add(tickets: TicketsSchema) {
-        viewModelScope.launch {
-            db.TicketsDao().insert(tickets)
-        }
-    }
 
     init {
         update()
+    }
+
+    fun add(data: TicketsSchema) {
+        viewModelScope.launch {
+            db.TicketsDao().insert(data)
+            update()
+        }
     }
 
     fun update() {
@@ -67,5 +68,4 @@ class TicketsViewModel(private val db: TicketsDataBase) : ViewModel() {
             tickets.addAll(db.TicketsDao().getAll())
         }
     }
-
 }

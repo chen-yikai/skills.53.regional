@@ -72,7 +72,8 @@ dependencies {
     implementation("androidx.webkit:webkit:1.8.0")
     implementation("io.coil-kt:coil:1.4.0")
     implementation("androidx.lifecycle:lifecycle-livedata:2.8.7")
-    val room_version = "2.6.1"
-    implementation("androidx.room:room-ktx:$room_version")
-    kapt("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.compose.animation:animation:1.3.3")
+    implementation("com.google.zxing:core:3.4.1")
 }

@@ -28,16 +28,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 
 @Preview
 @Composable
-fun CustomButton(label: String = "Hello", onClick: () -> Unit = {}) {
+fun CustomButton(label: String = "Hello", padding: Dp = 0.dp, onClick: () -> Unit = {}) {
     Button(
         onClick = onClick,
         colors = buttonColors(ColorBlue),
         shape = RoundedCornerShape(10.dp),
-        contentPadding = PaddingValues(0.dp),
+        contentPadding = PaddingValues(padding),
     ) {
         Text(label)
     }
