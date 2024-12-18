@@ -98,15 +98,16 @@ fun Tickets(nav: NavController = rememberNavController(), db: TicketsViewModel =
                         }
 
                     }
-                } else {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        LightGrayText("無票卡", size = 20.sp, weight = FontWeight.Bold)
-                    }
                 }
+                //                else {
+//                    Column(
+//                        modifier = Modifier.fillMaxSize(),
+//                        horizontalAlignment = Alignment.CenterHorizontally,
+//                        verticalArrangement = Arrangement.Center
+//                    ) {
+//                        LightGrayText("無票卡", size = 20.sp, weight = FontWeight.Bold)
+//                    }
+//                }
             }
         }
     }

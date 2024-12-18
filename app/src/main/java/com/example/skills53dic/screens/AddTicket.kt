@@ -1,6 +1,7 @@
 package com.example.skills53dic.screens
 
 import android.app.AlertDialog
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,7 +20,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,6 +62,9 @@ fun AddTicket(
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val option = arrayOf("ticket_1.png", "ticket_2.png", "ticket_3.png")
+    var selectedOption by remember { mutableStateOf<String?>(null) }
+    var imageShow by remember { mutableStateOf<Boolean>(false) }
 
     Scaffold(topBar = {
         AddTicketTopBar(nav)
@@ -74,8 +82,6 @@ fun AddTicket(
                     .border(1.dp, Color(0xFFa3a3a3), RoundedCornerShape(10.dp))
                     .background(Color(0xFFf7f7f7))
                     .clickable {
-                        val option = arrayOf("ticket_1.png", "ticket_2.png", "ticket_3.png")
-                        var selectedOption: String? = null
                         val builder = AlertDialog.Builder(context)
                         builder.setTitle("選擇測試圖片")
                         builder.setSingleChoiceItems(option, -1) { _, which ->
@@ -84,6 +90,7 @@ fun AddTicket(
                         builder.setPositiveButton("確定") { dialog, _ ->
                             if (selectedOption != null) {
                                 viewModel.qrcodeRead(context, "qrcode/$selectedOption")
+                                imageShow = true
                                 toast("成功自動填入${selectedOption}的資料", context)
                                 dialog.dismiss()
                             }
@@ -94,17 +101,22 @@ fun AddTicket(
                         val dialog = builder.create()
                         dialog.show()
                     }) {
-                    Column(modifier = Modifier.align(Alignment.Center)) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.add),
-                            contentDescription = "add ticket by scanning qrcode",
-                            tint = ColorBlue,
-                            modifier = Modifier
-                                .size(90.dp)
-                                .align(Alignment.CenterHorizontally)
-                        )
-                        LightGrayText("匯入票卡QRCode", 15.sp, FontWeight.Bold)
+                    if (imageShow) {
+                        ImageAsset("qrcode/$selectedOption")
+                    } else {
+                        Column(modifier = Modifier.align(Alignment.Center)) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.add),
+                                contentDescription = "add ticket by scanning qrcode",
+                                tint = ColorBlue,
+                                modifier = Modifier
+                                    .size(90.dp)
+                                    .align(Alignment.CenterHorizontally)
+                            )
+                            LightGrayText("匯入票卡QRCode", 15.sp, FontWeight.Bold)
+                        }
                     }
+
                 }
                 Sh(20.dp)
                 AddTicketInput(viewModel.type, "票種")
@@ -136,7 +148,7 @@ fun AddTicket(
                                     )
                                 )
                             } else {
-                                toast("票卡加入失敗: 此票卡已存在", context )
+                                toast("票卡加入失敗: 此票卡已存在", context)
                             }
                             nav.navigate("tickets")
                         }
