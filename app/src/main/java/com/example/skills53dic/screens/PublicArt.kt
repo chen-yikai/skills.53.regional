@@ -77,7 +77,7 @@ fun PublicArt() {
         Row(
             modifier = Modifier
                 .padding(horizontal = 20.dp)
-                .padding(top = 20.dp, bottom = 10.dp)
+                .padding(bottom = 5.dp, top = 10.dp)
         ) {
             places.forEachIndexed { index, item ->
                 Button(
@@ -106,10 +106,9 @@ fun PublicArt() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 20.dp, vertical = 10.dp)
+                .padding(horizontal = 20.dp)
                 .verticalScroll(scrollState)
         ) {
-            Sh(20.dp)
             Column {
                 publicArt.forEach {
                     Column {

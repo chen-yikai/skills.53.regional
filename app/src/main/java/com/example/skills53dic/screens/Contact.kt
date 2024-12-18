@@ -60,9 +60,7 @@ fun Contact(nav: NavController = rememberNavController()) {
                 BlackText("聯絡我們", 30.sp, FontWeight.Bold)
                 Sh(20.dp)
                 ContactInput(
-                    title,
-                    "標題",
-                    errorMessage = if (title.value.length >= 30) "" else ""
+                    title, "標題", errorMessage = if (title.value.length >= 30) "" else ""
                 ) {
                     if (it.length <= 30) {
                         title.value = it
@@ -76,9 +74,7 @@ fun Contact(nav: NavController = rememberNavController()) {
                     }
                 }
                 ContactInput(
-                    phone,
-                    "電話",
-                    errorMessage = phoneError
+                    phone, "電話", errorMessage = phoneError
                 ) {
                     phone.value = it
                 }
@@ -97,8 +93,7 @@ fun Contact(nav: NavController = rememberNavController()) {
                 }
                 Sw(5.dp)
                 CustomButton("送出") {
-                    if (title.value.isBlank() || name.value.isBlank() || phone.value.isBlank() || email.value.isBlank() || content.value.isBlank()
-                    ) {
+                    if (title.value.isBlank() || name.value.isBlank() || phone.value.isBlank() || email.value.isBlank() || content.value.isBlank()) {
                         toast("請輸入完整資訊", context)
                     } else {
                         toast("送出成功", context)
@@ -111,5 +106,5 @@ fun Contact(nav: NavController = rememberNavController()) {
 }
 
 fun toast(message: String = "Hello", context: Context) {
-    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }

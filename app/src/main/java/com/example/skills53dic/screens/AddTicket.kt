@@ -1,34 +1,30 @@
 package com.example.skills53dic.screens
 
+import android.app.AlertDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,7 +34,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.skills53dic.AddTicketViewModel
-import com.example.skills53dic.components.SafeColumn
 import com.example.skills53dic.R
 import com.example.skills53dic.components.AddTicketInput
 import com.example.skills53dic.components.BlueText
@@ -50,6 +45,7 @@ import com.example.skills53dic.components.Sh
 import com.example.skills53dic.components.Sw
 import com.example.skills53dic.db.TicketsSchema
 import com.example.skills53dic.db.TicketsViewModel
+import kotlinx.coroutines.launch
 
 @Preview(showBackground = true)
 @Composable
@@ -59,6 +55,8 @@ fun AddTicket(
     viewModel: AddTicketViewModel = viewModel()
 ) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     Scaffold(topBar = {
         AddTicketTopBar(nav)
@@ -71,15 +69,31 @@ fun AddTicket(
                     .verticalScroll(scrollState), horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Sh(20.dp)
-                Box(
-                    modifier = Modifier
-                        .size((LocalConfiguration.current.screenWidthDp * 0.5).dp)
-                        .border(1.dp, Color(0xFFa3a3a3), RoundedCornerShape(10.dp))
-                        .background(Color(0xFFf7f7f7))
-                        .clickable {
-
+                Box(modifier = Modifier
+                    .size((LocalConfiguration.current.screenWidthDp * 0.5).dp)
+                    .border(1.dp, Color(0xFFa3a3a3), RoundedCornerShape(10.dp))
+                    .background(Color(0xFFf7f7f7))
+                    .clickable {
+                        val option = arrayOf("ticket_1.png", "ticket_2.png", "ticket_3.png")
+                        var selectedOption: String? = null
+                        val builder = AlertDialog.Builder(context)
+                        builder.setTitle("選擇測試圖片")
+                        builder.setSingleChoiceItems(option, -1) { _, which ->
+                            selectedOption = option[which]
                         }
-                ) {
+                        builder.setPositiveButton("確定") { dialog, _ ->
+                            if (selectedOption != null) {
+                                viewModel.qrcodeRead(context, "qrcode/$selectedOption")
+                                toast("成功自動填入${selectedOption}的資料", context)
+                                dialog.dismiss()
+                            }
+                        }
+                        builder.setNegativeButton("取消") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        val dialog = builder.create()
+                        dialog.show()
+                    }) {
                     Column(modifier = Modifier.align(Alignment.Center)) {
                         Icon(
                             painter = painterResource(id = R.drawable.add),
@@ -108,24 +122,31 @@ fun AddTicket(
                     }
                     Sw(5.dp)
                     CustomButton("匯入") {
-                        db.add(
-                            TicketsSchema(
-                                id = viewModel.ticketId.value,
-                                type = viewModel.type.value,
-                                name = viewModel.name.value,
-                                email = viewModel.email.value,
-                                phone = viewModel.phone.value,
-                                date = viewModel.date.value,
-                                price = viewModel.price.value,
-                            )
-                        )
-                        nav.navigate("tickets")
+                        scope.launch {
+                            if (!db.checkSameId(viewModel.ticketId.value)) {
+                                db.add(
+                                    TicketsSchema(
+                                        id = viewModel.ticketId.value,
+                                        type = viewModel.type.value,
+                                        name = viewModel.name.value,
+                                        email = viewModel.email.value,
+                                        phone = viewModel.phone.value,
+                                        date = viewModel.date.value,
+                                        price = viewModel.price.value,
+                                    )
+                                )
+                            } else {
+                                toast("票卡加入失敗: 此票卡已存在", context )
+                            }
+                            nav.navigate("tickets")
+                        }
                     }
                 }
             }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Entity
@@ -34,6 +33,9 @@ interface TicketsDao {
 
     @Query("SELECT * FROM tickets")
     suspend fun getAll(): List<TicketsSchema>
+
+    @Query("SELECT COUNT(*) FROM tickets WHERE id = :id")
+    suspend fun checkSameId(id: String): Int
 }
 
 @Database(entities = [TicketsSchema::class], version = 1)
@@ -42,7 +44,6 @@ abstract class DataBase : RoomDatabase() {
 }
 
 fun getDataBase(context: Context): DataBase {
-//    context.deleteDatabase("db")
     return Room.databaseBuilder(
         context.applicationContext, DataBase::class.java, "db"
     ).build()
@@ -60,6 +61,10 @@ class TicketsViewModel(private val db: DataBase) : ViewModel() {
             db.TicketsDao().insert(data)
             update()
         }
+    }
+
+    suspend fun checkSameId(id: String): Boolean {
+        return db.TicketsDao().checkSameId(id) > 0
     }
 
     fun update() {
