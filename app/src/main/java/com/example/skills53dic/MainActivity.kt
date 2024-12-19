@@ -121,7 +121,7 @@ fun NavHoster(
                     composable("add_ticket") {
                         AddTicket(navController, ticketsViewModel)
                     }
-                    composable("buy_tickets") {
+                    composable("buy_ticket") {
                         BuyTickets()
                     }
                     composable("public_art") {

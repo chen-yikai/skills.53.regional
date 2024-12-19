@@ -61,9 +61,9 @@ fun Tickets(nav: NavController = rememberNavController(), db: TicketsViewModel =
         SafeColumn {
             Column(
                 modifier = Modifier
+                    .fillMaxSize()
                     .verticalScroll(scrollState)
                     .padding(innerpadding)
-                    .fillMaxSize()
             ) {
                 if (db.tickets.isNotEmpty()) {
                     db.tickets.forEach {
@@ -98,16 +98,15 @@ fun Tickets(nav: NavController = rememberNavController(), db: TicketsViewModel =
                         }
 
                     }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        Column(modifier = Modifier.align(Alignment.Center)) {
+                            LightGrayText("無票卡", size = 20.sp, weight = FontWeight.Bold)
+                        }
+                    }
                 }
-                //                else {
-//                    Column(
-//                        modifier = Modifier.fillMaxSize(),
-//                        horizontalAlignment = Alignment.CenterHorizontally,
-//                        verticalArrangement = Arrangement.Center
-//                    ) {
-//                        LightGrayText("無票卡", size = 20.sp, weight = FontWeight.Bold)
-//                    }
-//                }
             }
         }
     }

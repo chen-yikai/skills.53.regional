@@ -70,13 +70,13 @@ fun Home(nav: NavController, mediaCenterDetailViewModel: MediaCenterDetailViewMo
     Column(modifier = Modifier.verticalScroll(scrollState)) {
         Gallery()
         MediaCenter(nav, mediaCenterDetailViewModel)
-        TicketInfo()
+        TicketInfo(nav)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun TicketInfo() {
+fun TicketInfo(nav: NavController = rememberNavController()) {
     SafeColumn {
         BlackText("購票資訊", 20.sp, FontWeight.Bold)
         Spacer(modifier = Modifier.height(10.dp))
@@ -101,7 +101,7 @@ fun TicketInfo() {
                     Spacer(modifier = Modifier.weight(1f))
                     Button(
                         onClick = {
-
+                            nav.navigate("buy_ticket")
                         },
                         colors = ButtonDefaults.buttonColors(Color.Transparent),
                         modifier = Modifier
@@ -110,7 +110,6 @@ fun TicketInfo() {
                             )
                             .size(100.dp, 40.dp)
                     ) {
-                        // TODO: fix the height
                         BlackText("購票", 16.sp, FontWeight.Normal)
                     }
                 }
@@ -171,7 +170,6 @@ fun MediaCenter(
 }
 
 @Preview(showBackground = true)
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Gallery() {
     val pager_images = listOf(
