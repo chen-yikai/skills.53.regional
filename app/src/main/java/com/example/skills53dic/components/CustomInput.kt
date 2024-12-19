@@ -116,7 +116,6 @@ fun AddTicketInput(
         BasicTextField(
             value = value.value,
             onValueChange = { value.value = it },
-            textStyle = TextStyle.Default.copy(fontSize = fontSize.sp),
             singleLine = singleLine,
             maxLines = 10,
             modifier = Modifier

@@ -14,6 +14,16 @@ import com.google.zxing.RGBLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import java.io.InputStream
 
+class BuyTicketViewModel : ViewModel() {
+    var ticketTypeData = mutableStateOf(listOf<Int>(0, 0, 0, 0, 0))
+    fun setTicketTypeData(index: Int, item: String) {
+        val newItem = item.toIntOrNull() ?: 0
+        ticketTypeData.value = ticketTypeData.value.toMutableList().also {
+            it[index] = newItem
+        }
+    }
+}
+
 class MediaCenterDetailViewModel : ViewModel() {
     var data = mutableStateOf<MediaCenter?>(null)
 
