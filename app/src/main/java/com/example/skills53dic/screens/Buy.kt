@@ -334,7 +334,7 @@ fun TicketDetail(viewModel: BuyTicketViewModel = viewModel()) {
             CustomButton("Date Picker", padding = 10.dp) {
                 showDatePicker.value = true
             }
-            Text(text = selectedDate?.let { dateFormat.format(Date(it)) } ?: "")
+//            Text(text = selectedDate?.let { dateFormat.format(Date(it)) } ?: "")
         }
     }
 
