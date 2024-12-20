@@ -38,7 +38,7 @@ fun CustomButton(label: String = "Hello", padding: Dp = 0.dp, onClick: () -> Uni
         onClick = onClick,
         colors = buttonColors(ColorBlue),
         shape = RoundedCornerShape(10.dp),
-        contentPadding = PaddingValues(padding),
+        contentPadding = PaddingValues(horizontal = padding),
     ) {
         Text(label)
     }

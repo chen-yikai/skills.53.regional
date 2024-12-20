@@ -16,10 +16,13 @@ import java.io.InputStream
 
 class BuyTicketViewModel : ViewModel() {
     var ticketTypeData = mutableStateOf(listOf<Int>(0, 0, 0, 0, 0))
+
     fun setTicketTypeData(index: Int, item: String) {
-        val newItem = item.toIntOrNull() ?: 0
-        ticketTypeData.value = ticketTypeData.value.toMutableList().also {
-            it[index] = newItem
+        val newItem: Int = item.toIntOrNull() ?: 0
+        if (newItem >= 0) {
+            ticketTypeData.value = ticketTypeData.value.toMutableList().also {
+                it[index] = newItem
+            }
         }
     }
 }

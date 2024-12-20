@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -34,10 +35,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,8 +54,10 @@ import com.example.skills53dic.R
 import com.example.skills53dic.components.BlueText
 import com.example.skills53dic.components.ColorBlue
 import com.example.skills53dic.components.ColorLightGray
+import com.example.skills53dic.components.CustomButton
 import com.example.skills53dic.components.LightGrayText
 import com.example.skills53dic.components.SafeColumn
+import com.example.skills53dic.components.Sh
 import com.example.skills53dic.components.Sw
 import com.google.gson.Gson
 import java.io.BufferedReader
@@ -72,7 +77,7 @@ fun BuyTicket(RootNav: NavController = rememberNavController()) {
         ) {
             NavHost(navController = navController, startDestination = "ticket_type") {
                 composable("ticket_type") {
-                    TicketType(RootNav, viewModel)
+                    TicketType(navController, viewModel)
                 }
                 composable("ticket_detail") {
                     TicketDetail()
@@ -104,8 +109,10 @@ fun TicketType(
     SafeColumn {
         Column(
             modifier = Modifier
-                .border(
-                    1.dp, ColorLightGray, RoundedCornerShape(10.dp)
+                .shadow(5.dp, RoundedCornerShape(10.dp))
+                .border(1.dp, ColorLightGray, RoundedCornerShape(10.dp))
+                .background(
+                    Color.White
                 )
                 .padding(10.dp)
         ) {
@@ -116,17 +123,13 @@ fun TicketType(
                     "票種", color = ColorLightGray, modifier = Modifier.weight(1f)
                 )
                 Text(
-                    "票種", color = ColorLightGray, modifier = Modifier.weight(1f)
+                    "價格", color = ColorLightGray, modifier = Modifier.weight(1f)
                 )
                 Box(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        "數量",
-                        color = ColorLightGray,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(start = 5.dp)
+                        "數量", color = ColorLightGray, modifier = Modifier.align(Alignment.Center)
                     )
                 }
             }
@@ -153,9 +156,9 @@ fun TicketType(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.width(120.dp)
                     ) {
-                        IconButton(onClick = {
+                        IconButton(modifier = Modifier.size(40.dp, 40.dp), onClick = {
                             viewModel.setTicketTypeData(
-                                index, (viewModel.ticketTypeData.value[index] + 1).toString()
+                                index, (viewModel.ticketTypeData.value[index] - 1).toString()
                             )
                         }) {
                             Icon(
@@ -163,19 +166,27 @@ fun TicketType(
                                 contentDescription = "minus"
                             )
                         }
-                        Column(modifier = Modifier.size(40.dp, 30.dp)) {
+                        Box(
+                            modifier = Modifier.size(40.dp, 30.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
                             BasicTextField(
                                 value = viewModel.ticketTypeData.value[index].toString(),
                                 onValueChange = {
                                     viewModel.setTicketTypeData(index, it)
                                 },
-                                modifier = Modifier.fillMaxHeight(),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                modifier = Modifier.align(Alignment.Center),
                                 singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
                             )
-                            HorizontalDivider()
+                            HorizontalDivider(modifier = Modifier.align(Alignment.BottomCenter))
                         }
-                        IconButton(onClick = { /*TODO*/ }) {
+                        IconButton(modifier = Modifier.size(40.dp, 40.dp), onClick = {
+                            viewModel.setTicketTypeData(
+                                index, (viewModel.ticketTypeData.value[index] + 1).toString()
+                            )
+                        }) {
                             Icon(
                                 painter = painterResource(R.drawable.add),
                                 contentDescription = "plus"
@@ -185,13 +196,41 @@ fun TicketType(
                 }
             }
         }
+        Sh(20.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
+        ) {
+            CustomButton("下一步", 20.dp) {
+                nav.navigate("ticket_detail")
+            }
+        }
     }
 }
 
 
+@Preview(showBackground = true)
 @Composable
 fun TicketDetail() {
+    SafeColumn {
+        Column(
+            modifier = Modifier
+                .shadow(5.dp, RoundedCornerShape(10.dp))
+                .border(1.dp, ColorLightGray, RoundedCornerShape(10.dp))
+                .background(
+                    Color.White
+                )
+                .padding(10.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                LightGrayText("票種", size = 15.sp)
+                LightGrayText("價格", size = 15.sp)
+                LightGrayText("數量", size = 15.sp)
+            }
 
+        }
+    }
 }
 
 @Preview(showBackground = true)
