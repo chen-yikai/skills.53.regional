@@ -10,18 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.CreationExtras
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.skills53dic.components.BlackText
-import com.example.skills53dic.components.ColorGreen
 import com.example.skills53dic.components.CustomButton
 import com.example.skills53dic.components.CustomTextButton
 import com.example.skills53dic.components.ContactInput
@@ -34,28 +30,35 @@ import kotlin.text.Regex
 @Composable
 fun Contact(nav: NavController = rememberNavController()) {
     val context = LocalContext.current
-    var title = remember { mutableStateOf("") }
-    var name = remember { mutableStateOf("") }
-    var phone = remember { mutableStateOf("") }
-    var email = remember { mutableStateOf("") }
-    var content = remember { mutableStateOf("") }
-    var phoneError = if (phone.value.isEmpty()) {
+    val title = remember { mutableStateOf("") }
+    val name = remember { mutableStateOf("") }
+    val phone = remember { mutableStateOf("") }
+    val email = remember { mutableStateOf("") }
+    val content = remember { mutableStateOf("") }
+    val syntaxError = remember { mutableStateOf(false) }
+    val phoneError = if (phone.value.isEmpty()) {
+        syntaxError.value = false
         ""
     } else if (!Regex("^09\\d{8}").matches(phone.value)) {
+        syntaxError.value = true
         "格式錯誤"
     } else {
+        syntaxError.value = false
         ""
     }
-    var emailError = if (email.value.isEmpty()) {
+    val emailError = if (email.value.isEmpty()) {
+        syntaxError.value = false
         ""
     } else if (!Regex("^[A-Za-z0-9+_.-]+@[a-zA-Z].[A-zA-z]\$").matches(email.value)) {
+        syntaxError.value = true
         "格式錯誤"
     } else {
+        syntaxError.value = false
         ""
     }
 
     SafeColumn {
-        Column() {
+        Column {
             Column {
                 BlackText("聯絡我們", 30.sp, FontWeight.Bold)
                 Sh(20.dp)
@@ -95,6 +98,8 @@ fun Contact(nav: NavController = rememberNavController()) {
                 CustomButton("送出") {
                     if (title.value.isBlank() || name.value.isBlank() || phone.value.isBlank() || email.value.isBlank() || content.value.isBlank()) {
                         toast("請輸入完整資訊", context)
+                    } else if (syntaxError.value) {
+                        toast("電話或電子郵件格式錯誤", context)
                     } else {
                         toast("送出成功", context)
                         nav.navigate("contact")
