@@ -47,6 +47,8 @@ import com.example.skills53dic.screens.Floor3d
 import com.example.skills53dic.screens.Home
 import com.example.skills53dic.screens.MediaCenterDetail
 import com.example.skills53dic.screens.PublicArt
+import com.example.skills53dic.screens.SignIn
+import com.example.skills53dic.screens.SignUp
 import com.example.skills53dic.screens.Tickets
 import kotlinx.coroutines.delay
 
@@ -97,6 +99,12 @@ fun NavHoster(
                     }
                     composable("about_info") {
                         AboutInfo()
+                    }
+                    composable("signin") {
+                        SignIn()
+                    }
+                    composable("signup") {
+                        SignUp()
                     }
                     composable("floor_3d") {
                         Floor3d()
