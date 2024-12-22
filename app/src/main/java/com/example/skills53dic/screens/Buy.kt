@@ -209,9 +209,9 @@ fun TicketType(
         Row(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
         ) {
-            CustomButton("下一步", 20.dp) {
+            CustomButton("下一步", 20.dp, modifier = Modifier, onClick = {
                 nav.navigate("ticket_detail")
-            }
+            })
         }
     }
 }

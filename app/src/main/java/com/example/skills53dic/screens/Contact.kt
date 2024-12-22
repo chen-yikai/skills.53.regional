@@ -39,7 +39,7 @@ fun Contact(nav: NavController = rememberNavController()) {
     val phoneError = if (phone.value.isEmpty()) {
         syntaxError.value = false
         ""
-    } else if (!Regex("^09\\d{8}").matches(phone.value)) {
+    } else if (!Regex("^09\\d{8}").matches(phone.value) || phone.value.contains(" ")) {
         syntaxError.value = true
         "格式錯誤"
     } else {
@@ -49,7 +49,10 @@ fun Contact(nav: NavController = rememberNavController()) {
     val emailError = if (email.value.isEmpty()) {
         syntaxError.value = false
         ""
-    } else if (!Regex("^[A-Za-z0-9+_.-]+@[a-zA-Z].[A-zA-z]\$").matches(email.value)) {
+    } else if (!Regex("^[A-Za-z0-9+_.-]+@[a-zA-Z]+\\.[A-zA-z]+$").matches(email.value) || email.value.contains(
+            " "
+        )
+    ) {
         syntaxError.value = true
         "格式錯誤"
     } else {
@@ -98,6 +101,11 @@ fun Contact(nav: NavController = rememberNavController()) {
                 CustomButton("送出") {
                     if (title.value.isBlank() || name.value.isBlank() || phone.value.isBlank() || email.value.isBlank() || content.value.isBlank()) {
                         toast("請輸入完整資訊", context)
+                    } else if (title.value.contains(" ") || name.value.contains(" ") || content.value.contains(
+                            " "
+                        ) || phone.value.contains(" ") || email.value.contains(" ")
+                    ) {
+                        toast("不能有空白", context)
                     } else if (syntaxError.value) {
                         toast("電話或電子郵件格式錯誤", context)
                     } else {

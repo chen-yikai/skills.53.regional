@@ -26,6 +26,11 @@ data class TicketsSchema(
     val price: String
 )
 
+@Entity(tableName = "users")
+data class UsersSchema(
+    @PrimaryKey val email: String, val password: String
+)
+
 @Dao
 interface TicketsDao {
     @Insert
@@ -38,15 +43,63 @@ interface TicketsDao {
     suspend fun checkSameId(id: String): Int
 }
 
-@Database(entities = [TicketsSchema::class], version = 1)
+@Dao
+interface UsersDao {
+    @Insert
+    suspend fun insert(users: UsersSchema)
+
+    @Query("SELECT * FROM users")
+    suspend fun getAll(): List<UsersSchema>
+
+    @Query("SELECT COUNT(*) FROM users WHERE email = :email")
+    suspend fun checkSameEmail(email: String): Int
+
+    @Query("SELECT COUNT(*) FROM users WHERE email = :email AND password = :password")
+    suspend fun auth(email: String, password: String): Int
+}
+
+@Database(entities = [TicketsSchema::class, UsersSchema::class], version = 3)
 abstract class DataBase : RoomDatabase() {
     abstract fun TicketsDao(): TicketsDao
+    abstract fun UsersDao(): UsersDao
 }
 
 fun getDataBase(context: Context): DataBase {
     return Room.databaseBuilder(
         context.applicationContext, DataBase::class.java, "db"
-    ).build()
+    )
+        .fallbackToDestructiveMigration()
+        .build()
+}
+
+class UsersViewModel(private val db: DataBase) : ViewModel() {
+    val users = mutableStateListOf<UsersSchema>()
+
+    init {
+        update()
+    }
+
+    fun update() {
+        viewModelScope.launch {
+            users.clear()
+            users.addAll(db.UsersDao().getAll())
+        }
+    }
+
+    fun add(data: UsersSchema) {
+        viewModelScope.launch {
+            db.UsersDao().insert(data)
+        }
+    }
+
+    suspend fun checkSameEmail(email: String): Boolean {
+        return db.UsersDao().checkSameEmail(email) > 0
+    }
+
+    suspend fun authSignIn(email: String, password: String): Boolean {
+        return db.UsersDao().auth(email, password) > 0
+    }
+
 }
 
 class TicketsViewModel(private val db: DataBase) : ViewModel() {

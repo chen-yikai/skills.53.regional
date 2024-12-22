@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,11 +26,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -37,6 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.skills53dic.components.DrawerContent
 import com.example.skills53dic.components.TopBar
 import com.example.skills53dic.db.TicketsViewModel
+import com.example.skills53dic.db.UsersViewModel
 import com.example.skills53dic.db.getDataBase
 import com.example.skills53dic.screens.AboutInfo
 import com.example.skills53dic.screens.AboutOperator
@@ -57,7 +61,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SplashScreen()
+            NavHoster()
         }
     }
 }
@@ -73,6 +77,7 @@ fun NavHoster(
     val currentDestination = currentBackStackEntry.value?.destination
     val DataBase = getDataBase(LocalContext.current)
     val ticketsViewModel = TicketsViewModel(DataBase)
+    val usersViewModel = UsersViewModel(DataBase)
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -86,8 +91,9 @@ fun NavHoster(
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
+                    .background(Color.White)
             ) {
-                NavHost(navController = navController, startDestination = "home") {
+                NavHost(navController = navController, startDestination = "signin") {
                     composable("home") {
                         Home(navController, mediaCenterDetailViewModel)
                     }
@@ -101,10 +107,10 @@ fun NavHoster(
                         AboutInfo()
                     }
                     composable("signin") {
-                        SignIn()
+                        SignIn(navController, usersViewModel)
                     }
                     composable("signup") {
-                        SignUp()
+                        SignUp(navController, usersViewModel)
                     }
                     composable("floor_3d") {
                         Floor3d()
@@ -124,6 +130,9 @@ fun NavHoster(
                     composable("public_art") {
                         PublicArt()
                     }
+                    composable("splash_screen") {
+                        SplashScreen(navController)
+                    }
                 }
             }
         }
@@ -132,11 +141,11 @@ fun NavHoster(
 
 @Preview(showBackground = true)
 @Composable
-fun SplashScreen() {
+fun SplashScreen(nav: NavController = rememberNavController()) {
     var showSplashScreen by rememberSaveable { mutableStateOf(true) }
     LaunchedEffect(Unit) {
-        delay(0)
-        showSplashScreen = false
+        delay(2000)
+        nav.navigate("home")
     }
     if (showSplashScreen) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -146,7 +155,5 @@ fun SplashScreen() {
                 modifier = Modifier.size(200.dp)
             )
         }
-    } else {
-        NavHoster()
     }
 }
