@@ -1,8 +1,10 @@
 package com.example.skills53dic.components
 
+import android.hardware.lights.Light
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -81,6 +83,29 @@ fun ErrorToast(message: String = "Hello", delay: Int = 2000) {
     }
 }
 
+
+@Composable
+fun BuyBox(
+    text: MutableState<String>, label: String, click: () -> Unit = {}
+) {
+    Column() {
+        LightGrayText(label, 13.sp)
+        Sh(3.dp)
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                1.dp, ColorGreen, RoundedCornerShape(10.dp)
+            )
+            .padding(10.dp)
+            .clickable {
+                click()
+            }) {
+            LightGrayText(text.value, size = 15.sp)
+        }
+        Sh(15.dp)
+    }
+}
+
 @Composable
 fun ContactInput(
     value: MutableState<String>,
@@ -89,6 +114,7 @@ fun ContactInput(
     errorMessage: String = "",
     fontSize: Int = 15,
     singleLine: Boolean = true,
+    modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit = {},
 ) {
     Column() {

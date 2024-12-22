@@ -1,13 +1,9 @@
 package com.example.skills53dic.screens
 
 import android.annotation.SuppressLint
-import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,23 +14,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerState
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -45,14 +39,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -67,21 +57,26 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
+import androidx.room.util.TableInfo
 import com.example.skills53dic.BuyTicketViewModel
 import com.example.skills53dic.R
 import com.example.skills53dic.components.BlueText
+import com.example.skills53dic.components.BuyBox
 import com.example.skills53dic.components.ColorBlue
 import com.example.skills53dic.components.ColorLightGray
 import com.example.skills53dic.components.ContactInput
 import com.example.skills53dic.components.CustomButton
+import com.example.skills53dic.components.CustomTextButton
+import com.example.skills53dic.components.GreenText
 import com.example.skills53dic.components.LightGrayText
 import com.example.skills53dic.components.SafeColumn
 import com.example.skills53dic.components.Sh
+import com.example.skills53dic.components.Sw
 import com.example.skills53dic.components.TableFucker
 import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.net.DatagramPacket
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -106,7 +101,7 @@ fun BuyTicket(RootNav: NavController = rememberNavController()) {
                 }
 
                 composable("ticket_detail") {
-                    TicketDetail(viewModel)
+                    TicketDetail(viewModel, BuyNav)
                 }
             }
 
@@ -216,17 +211,14 @@ fun TicketType(
     }
 }
 
-fun formatDate(dateMillis: Long): String {
-    val date = Date(dateMillis)
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    return dateFormat.format(date)
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType")
 @Preview(showBackground = true)
 @Composable
-fun TicketDetail(viewModel: BuyTicketViewModel = viewModel()) {
+fun TicketDetail(
+    viewModel: BuyTicketViewModel = viewModel(),
+    nav: NavController = rememberNavController()
+) {
     val context = LocalContext.current
     val gson = Gson()
     val dataJson: String = context.assets.open("ticket_type.json").use { inputStream ->
@@ -234,16 +226,22 @@ fun TicketDetail(viewModel: BuyTicketViewModel = viewModel()) {
             reader.readText()
         }
     }
+    val paymentMethodsJson: String = context.assets.open("payment_method.json").use { inputStream ->
+        BufferedReader(InputStreamReader(inputStream)).use { reader ->
+            reader.readText()
+        }
+    }
     val data = gson.fromJson(dataJson, Array<TicketTypeSchema>::class.java)
+    val paymentMethods = gson.fromJson(paymentMethodsJson, Array<String>::class.java)
     val TotalCount = rememberSaveable { mutableStateOf<Int>(0) }
-    val name = rememberSaveable { mutableStateOf("") }
-    val email = rememberSaveable { mutableStateOf("") }
-    val phone = rememberSaveable { mutableStateOf("") }
-    var payment = rememberSaveable { mutableStateOf("") }
+    val name = remember { mutableStateOf("") }
+    val email = remember { mutableStateOf("") }
+    val phone = remember { mutableStateOf("") }
+    val payment = remember { mutableStateOf("") }
+    var paymentDropDownShow = remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
-    val selectedDate = remember { mutableStateOf<Long?>(null) }
-    val showDatePicker = remember { mutableStateOf(true) }
-    val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
+    val showDatePicker = remember { mutableStateOf(false) }
+    val selectedDate = remember { mutableStateOf("") }
 
     LaunchedEffect(data) {
         if (data.isNotEmpty()) {
@@ -252,11 +250,12 @@ fun TicketDetail(viewModel: BuyTicketViewModel = viewModel()) {
         }
     }
 
-    Text(selectedDate.value.toString())
     if (showDatePicker.value) {
         DatePickerDialog(onDismissRequest = {}, confirmButton = {
             Button(onClick = {
-                selectedDate.value = datePickerState.selectedDateMillis
+                val milliseconds = datePickerState.selectedDateMillis
+                val formater = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
+                selectedDate.value = milliseconds?.let { formater.format(Date(it)) }.toString()
                 showDatePicker.value = false
             }) {
                 Text("OK")
@@ -331,52 +330,40 @@ fun TicketDetail(viewModel: BuyTicketViewModel = viewModel()) {
             ContactInput(phone, "電話") {
                 phone.value = it
             }
-            CustomButton("Date Picker", padding = 10.dp) {
+            BuyBox(text = selectedDate, label = "日期") {
                 showDatePicker.value = true
             }
-//            Text(text = selectedDate?.let { dateFormat.format(Date(it)) } ?: "")
-        }
-    }
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Dater() {
-    var selectedDate by remember { mutableStateOf<Long?>(null) }
-    var showDatePicker by remember { mutableStateOf(false) }
-    val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
-
-    Column(modifier = Modifier.padding(16.dp)) {
-        OutlinedTextField(value = selectedDate?.let { dateFormat.format(Date(it)) } ?: "",
-            onValueChange = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { showDatePicker = true },
-            readOnly = true,
-            label = { Text("Select Date") })
-
-        if (showDatePicker) {
-            DatePickerDialog(onDismissRequest = { showDatePicker = false }, confirmButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("OK")
+            Column() {
+                BuyBox(text = payment, label = "付款方式") {
+                    paymentDropDownShow.value = true
                 }
-            }, dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
-                }
-            }) {
-                val datePickerState = rememberDatePickerState()
-                DatePicker(state = datePickerState)
-                LaunchedEffect(datePickerState.selectedDateMillis) {
-                    if (datePickerState.selectedDateMillis != null) {
-                        selectedDate = datePickerState.selectedDateMillis
+                DropdownMenu(
+                    expanded = paymentDropDownShow.value,
+                    onDismissRequest = { paymentDropDownShow.value = false },
+                ) {
+                    paymentMethods.forEach {
+                        DropdownMenuItem(text = {
+                            Text(it, fontSize = 15.sp)
+                        }, onClick = {
+                            payment.value = it
+                            paymentDropDownShow.value = false
+                        })
                     }
                 }
             }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                CustomTextButton("上一步") {
+                    nav.popBackStack()
+                }
+                Sw(10.dp)
+                CustomButton("確認購買", padding = 10.dp) {
+
+                }
+            }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
