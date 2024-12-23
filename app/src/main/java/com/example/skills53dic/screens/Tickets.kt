@@ -96,8 +96,8 @@ fun Tickets(nav: NavController = rememberNavController(), db: TicketsViewModel =
                                 )
                             }
                         }
-
                     }
+                    Sh(60.dp)
                 } else {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -109,6 +109,7 @@ fun Tickets(nav: NavController = rememberNavController(), db: TicketsViewModel =
                 }
             }
         }
+
     }
 }
 

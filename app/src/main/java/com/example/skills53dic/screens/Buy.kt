@@ -1,11 +1,9 @@
 package com.example.skills53dic.screens
 
 import android.annotation.SuppressLint
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -32,7 +29,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +36,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -58,8 +53,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navigation
-import androidx.room.util.TableInfo
 import com.example.skills53dic.BuyTicketViewModel
 import com.example.skills53dic.R
 import com.example.skills53dic.components.BlueText
@@ -69,7 +62,6 @@ import com.example.skills53dic.components.ColorLightGray
 import com.example.skills53dic.components.ContactInput
 import com.example.skills53dic.components.CustomButton
 import com.example.skills53dic.components.CustomTextButton
-import com.example.skills53dic.components.GreenText
 import com.example.skills53dic.components.LightGrayText
 import com.example.skills53dic.components.SafeColumn
 import com.example.skills53dic.components.Sh
@@ -83,10 +75,25 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import android.util.Patterns
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import com.example.skills53dic.components.BlackText
+import com.example.skills53dic.db.TicketsSchema
+import com.example.skills53dic.db.TicketsViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BuyTicket(RootNav: NavController = rememberNavController()) {
+fun BuyTicket(
+    RootNav: NavController = rememberNavController(), db: TicketsViewModel = viewModel()
+) {
     val BuyNav = rememberNavController()
     val viewModel = BuyTicketViewModel()
     Scaffold(topBar = {
@@ -103,7 +110,7 @@ fun BuyTicket(RootNav: NavController = rememberNavController()) {
                 }
 
                 composable("ticket_detail") {
-                    TicketDetail(viewModel, BuyNav)
+                    TicketDetail(viewModel, BuyNav, RootNav, db)
                 }
             }
 
@@ -207,20 +214,31 @@ fun TicketType(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
         ) {
             CustomButton("下一步", 20.dp, modifier = Modifier, onClick = {
-                nav.navigate("ticket_detail")
+                var total = 0
+                viewModel.ticketTypeData.value.forEach {
+                    total += it
+                }
+                if (total != 0) {
+                    nav.navigate("ticket_detail")
+                } else {
+                    toast("請選擇至少一張票", context)
+                }
             })
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("RememberReturnType")
 @Preview(showBackground = true)
 @Composable
 fun TicketDetail(
-    viewModel: BuyTicketViewModel = viewModel(), nav: NavController = rememberNavController()
+    viewModel: BuyTicketViewModel = viewModel(),
+    nav: NavController = rememberNavController(),
+    rootNav: NavController = rememberNavController(),
+    db: TicketsViewModel = viewModel()
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val gson = Gson()
     val dataJson: String = context.assets.open("ticket_type.json").use { inputStream ->
         BufferedReader(InputStreamReader(inputStream)).use { reader ->
@@ -278,11 +296,23 @@ fun TicketDetail(
     val todayMillis = calendar.timeInMillis
     val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
     val today = dateFormat.format(Date(todayMillis))
+    val showAlertDialog = remember { mutableStateOf(false) }
+    val showSuccessDialog = remember { mutableStateOf(false) }
 
     LaunchedEffect(data) {
         if (data.isNotEmpty()) {
             totalCount.value =
                 data.sumOf { it.price * viewModel.ticketTypeData.value[data.indexOf(it)] }
+        }
+    }
+
+    LaunchedEffect(showSuccessDialog.value) {
+        if (showSuccessDialog.value == true) {
+            showAlertDialog.value = false
+            showSuccessDialog.value = true
+            delay(2000)
+            showSuccessDialog.value = false
+            rootNav.navigate("tickets")
         }
     }
 
@@ -413,10 +443,117 @@ fun TicketDetail(
                     } else if (syntaxError) {
                         toast("表單格式有誤", context)
                     } else {
-                        toast("購買成功", context)
+                        showAlertDialog.value = true
                     }
                 }
             }
+        }
+    }
+    if (showAlertDialog.value) {
+        AlertDialogChecker(
+            totalCount.value,
+            payment.value,
+            dismiss = { showAlertDialog.value = false },
+        ) {
+            scope.launch {
+                data.forEachIndexed { index, item ->
+                    val ticketTypeData = viewModel.ticketTypeData.value[index]
+                    if (ticketTypeData != 0) {
+                        for (count in 1..ticketTypeData) {
+                            val uuid = UUID.randomUUID().toString().slice(0..10).let {
+                                "TK-$it"
+                            }
+                            db.add(
+                                TicketsSchema(
+                                    id = uuid,
+                                    type = item.ticketType,
+                                    name = name.value,
+                                    email = email.value,
+                                    phone = phone.value,
+                                    price = item.price.toString(),
+                                    date = selectedDate.value
+                                )
+                            )
+                        }
+                    }
+                }
+                showSuccessDialog.value = true
+            }
+        }
+    }
+    if (showSuccessDialog.value) {
+        SuccessDialog()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+fun AlertDialogChecker(
+    total: Int = 0,
+    paymentMethod: String = "Google Pay",
+    dismiss: () -> Unit = {},
+    confirm: () -> Unit = {},
+) {
+    BasicAlertDialog(onDismissRequest = { dismiss() }) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(10))
+                .background(Color.White)
+                .padding(20.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BlackText("總金額")
+                BlackText("NT $total")
+            }
+            Sh(10.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BlackText("付款方式")
+                BlackText(paymentMethod)
+            }
+            Sh(20.dp)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                CustomTextButton("取消") {
+                    dismiss()
+                }
+                CustomButton("確認") {
+                    confirm()
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+fun SuccessDialog() {
+    BasicAlertDialog(onDismissRequest = {}) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.check),
+                contentDescription = "check image",
+                modifier = Modifier.height(160.dp)
+            )
+            Sh(30.dp)
+            Text(
+                text = "購買成功",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
     }
 }

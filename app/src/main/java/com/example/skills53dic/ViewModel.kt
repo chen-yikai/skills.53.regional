@@ -3,7 +3,9 @@ package com.example.skills53dic
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.skills53dic.screens.MediaCenter
@@ -16,6 +18,7 @@ import java.io.InputStream
 
 class BuyTicketViewModel : ViewModel() {
     var ticketTypeData = mutableStateOf(listOf<Int>(0, 0, 0, 0, 0))
+    var ticketType = mutableStateListOf<String>("一日票", "雙日票", "優待票", "敬老票", "學生票")
 
     fun setTicketTypeData(index: Int, item: String) {
         val newItem: Int = item.toIntOrNull() ?: 0

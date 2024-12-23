@@ -93,7 +93,7 @@ fun NavHoster(
                     .fillMaxSize()
                     .background(Color.White)
             ) {
-                NavHost(navController = navController, startDestination = "buy_ticket") {
+                NavHost(navController = navController, startDestination = "signin") {
                     composable("home") {
                         Home(navController, mediaCenterDetailViewModel)
                     }
@@ -125,7 +125,7 @@ fun NavHoster(
                         AddTicket(navController, ticketsViewModel)
                     }
                     composable("buy_ticket") {
-                        BuyTicket(navController)
+                        BuyTicket(navController, ticketsViewModel)
                     }
                     composable("public_art") {
                         PublicArt()
