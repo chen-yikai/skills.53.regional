@@ -1,6 +1,7 @@
 package com.example.skills53dic.screens
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -81,6 +82,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import android.util.Patterns
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -216,8 +218,7 @@ fun TicketType(
 @Preview(showBackground = true)
 @Composable
 fun TicketDetail(
-    viewModel: BuyTicketViewModel = viewModel(),
-    nav: NavController = rememberNavController()
+    viewModel: BuyTicketViewModel = viewModel(), nav: NavController = rememberNavController()
 ) {
     val context = LocalContext.current
     val gson = Gson()
@@ -226,37 +227,77 @@ fun TicketDetail(
             reader.readText()
         }
     }
-    val paymentMethodsJson: String = context.assets.open("payment_method.json").use { inputStream ->
-        BufferedReader(InputStreamReader(inputStream)).use { reader ->
-            reader.readText()
+    val paymentMethodsJson: String = context.assets.open("payment_method.json").use {
+        BufferedReader(InputStreamReader(it)).use {
+            it.readText()
         }
     }
     val data = gson.fromJson(dataJson, Array<TicketTypeSchema>::class.java)
     val paymentMethods = gson.fromJson(paymentMethodsJson, Array<String>::class.java)
-    val TotalCount = rememberSaveable { mutableStateOf<Int>(0) }
+    val totalCount = rememberSaveable { mutableStateOf<Int>(0) }
+    var syntaxError = false
     val name = remember { mutableStateOf("") }
+    var nameError = if (name.value.isEmpty()) {
+        ""
+    } else if (name.value.contains(" ")) {
+        syntaxError = true
+        "勿包含空白字元"
+    } else {
+        ""
+    }
     val email = remember { mutableStateOf("") }
+    var emailError = if (email.value.isEmpty()) {
+        ""
+    } else if (email.value.contains(" ")) {
+        syntaxError = true
+        "勿包含空白字元"
+    } else if (!Patterns.EMAIL_ADDRESS.matcher(email.value).matches()) {
+        syntaxError = true
+        "格式錯誤"
+    } else {
+        ""
+    }
     val phone = remember { mutableStateOf("") }
+    var phoneError = if (phone.value.isEmpty()) {
+        ""
+    } else if (phone.value.contains(" ")) {
+        syntaxError = true
+        "勿包含空白字元"
+    } else if (!Regex("^09[0-9]{8}$").matches(phone.value)) {
+        syntaxError = true
+        "格式錯誤"
+    } else {
+        ""
+    }
     val payment = remember { mutableStateOf("") }
     var paymentDropDownShow = remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     val showDatePicker = remember { mutableStateOf(false) }
     val selectedDate = remember { mutableStateOf("") }
+    val calendar = Calendar.getInstance()
+    val todayMillis = calendar.timeInMillis
+    val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+    val today = dateFormat.format(Date(todayMillis))
 
     LaunchedEffect(data) {
         if (data.isNotEmpty()) {
-            TotalCount.value =
+            totalCount.value =
                 data.sumOf { it.price * viewModel.ticketTypeData.value[data.indexOf(it)] }
         }
     }
 
     if (showDatePicker.value) {
-        DatePickerDialog(onDismissRequest = {}, confirmButton = {
+        DatePickerDialog(onDismissRequest = { showDatePicker.value = false }, confirmButton = {
             Button(onClick = {
                 val milliseconds = datePickerState.selectedDateMillis
-                val formater = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
-                selectedDate.value = milliseconds?.let { formater.format(Date(it)) }.toString()
-                showDatePicker.value = false
+                val userFormat = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
+                val tempSelectDate = dateFormat.format(Date(milliseconds!!))
+                if (tempSelectDate < today) {
+                    toast("請輸入今日以後的日期", context)
+                } else {
+                    selectedDate.value = userFormat.format(Date(milliseconds))
+                    showDatePicker.value = false
+                }
             }) {
                 Text("OK")
             }
@@ -267,7 +308,9 @@ fun TicketDetail(
                 Text("Cancel")
             }
         }) {
-            DatePicker(state = datePickerState)
+            DatePicker(
+                state = datePickerState,
+            )
         }
     }
 
@@ -314,20 +357,28 @@ fun TicketDetail(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 LightGrayText("總額", 15.sp)
-                BlueText("NT " + TotalCount.value.toString(), 15.sp)
+                BlueText("NT " + totalCount.value.toString(), 15.sp)
             }
         }
         Sh(20.dp)
         Text("購買人資料", fontWeight = FontWeight.Bold, fontSize = 17.sp)
         Sh(10.dp)
         Column {
-            ContactInput(name, "姓名") {
-                name.value = it
+            ContactInput(name, "姓名", errorMessage = nameError) {
+                if (it.length <= 15) {
+                    name.value = it
+                } else {
+                    toast("姓名不可超過15字元", context)
+                }
             }
-            ContactInput(email, "電子郵件") {
-                email.value = it
+            ContactInput(email, "電子郵件", errorMessage = emailError) {
+                if (it.length <= 30) {
+                    email.value = it
+                } else {
+                    toast("Email不可超過30字元", context)
+                }
             }
-            ContactInput(phone, "電話") {
+            ContactInput(phone, "電話", errorMessage = phoneError) {
                 phone.value = it
             }
             BuyBox(text = selectedDate, label = "日期") {
@@ -357,7 +408,13 @@ fun TicketDetail(
                 }
                 Sw(10.dp)
                 CustomButton("確認購買", padding = 10.dp) {
-
+                    if (name.value.isEmpty() || email.value.isEmpty() || phone.value.isEmpty() || selectedDate.value.isEmpty() || payment.value.isEmpty()) {
+                        toast("請填寫完整表單", context)
+                    } else if (syntaxError) {
+                        toast("表單格式有誤", context)
+                    } else {
+                        toast("購買成功", context)
+                    }
                 }
             }
         }
@@ -390,12 +447,10 @@ fun BuyTicketsTopBar(
                 contentDescription = "Back"
             )
         }
-        Text(
+        BlueText(
             "2023第41屆新一代設計展",
-            modifier = Modifier.align(Alignment.Center),
-            color = ColorBlue,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
+            weight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.Center)
         )
     }
 }

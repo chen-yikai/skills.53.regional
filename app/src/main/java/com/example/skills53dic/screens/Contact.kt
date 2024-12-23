@@ -39,7 +39,8 @@ fun Contact(nav: NavController = rememberNavController()) {
     val phoneError = if (phone.value.isEmpty()) {
         syntaxError.value = false
         ""
-    } else if (!Regex("^09\\d{8}").matches(phone.value) || phone.value.contains(" ")) {
+    } else if (!Regex("^09[0-9]{8}$").matches(phone.value) || phone.value.contains(" ")
+    ) {
         syntaxError.value = true
         "格式錯誤"
     } else {
@@ -49,7 +50,8 @@ fun Contact(nav: NavController = rememberNavController()) {
     val emailError = if (email.value.isEmpty()) {
         syntaxError.value = false
         ""
-    } else if (!Regex("^[A-Za-z0-9+_.-]+@[a-zA-Z]+\\.[A-zA-z]+$").matches(email.value) || email.value.contains(
+    } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email.value)
+            .matches() || email.value.contains(
             " "
         )
     ) {
@@ -77,6 +79,8 @@ fun Contact(nav: NavController = rememberNavController()) {
                 ) {
                     if (it.length <= 15) {
                         name.value = it
+                    } else {
+                        toast("姓名不可超過15字元", context)
                     }
                 }
                 ContactInput(
@@ -87,6 +91,8 @@ fun Contact(nav: NavController = rememberNavController()) {
                 ContactInput(email, "電子郵件", errorMessage = emailError) {
                     if (it.length <= 30) {
                         email.value = it
+                    } else {
+                        toast("Email不可超過30字元", context)
                     }
                 }
                 ContactInput(content, "內容", singleLine = false) {
