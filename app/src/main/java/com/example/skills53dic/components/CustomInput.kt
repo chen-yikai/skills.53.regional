@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +35,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation.Companion.None
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
@@ -171,7 +175,9 @@ fun AddTicketInput(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AuthInput(icon: Int, value: MutableState<String>, placeholder: String) {
+fun AuthInput(
+    icon: Int, value: MutableState<String>, placeholder: String, password: Boolean = false
+) {
     Column() {
         Row(
             modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
@@ -197,7 +203,8 @@ fun AuthInput(icon: Int, value: MutableState<String>, placeholder: String) {
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp)
+                        .padding(10.dp),
+                    visualTransformation = if (password) PasswordVisualTransformation() else None,
                 )
                 if (value.value.isEmpty()) {
                     Text(

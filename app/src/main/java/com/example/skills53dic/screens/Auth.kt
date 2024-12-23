@@ -64,8 +64,8 @@ fun SignUp(nav: NavController = rememberNavController(), db: UsersViewModel = vi
         )
         Column() {
             AuthInput(R.drawable.mail_green, email, "輸入Email")
-            AuthInput(R.drawable.locl_green, password, "輸入密碼")
-            AuthInput(R.drawable.locl_green, passwordConfirm, "確認密碼")
+            AuthInput(R.drawable.locl_green, password, "輸入密碼", true)
+            AuthInput(R.drawable.locl_green, passwordConfirm, "確認密碼", true)
         }
         CustomButton("註冊", color = ColorGreen, modifier = Modifier.fillMaxWidth()) {
             scope.launch {
@@ -127,7 +127,7 @@ fun SignIn(nav: NavController = rememberNavController(), db: UsersViewModel = vi
         )
         Column() {
             AuthInput(R.drawable.mail_green, email, "輸入Email")
-            AuthInput(R.drawable.locl_green, password, "輸入密碼")
+            AuthInput(R.drawable.locl_green, password, "輸入密碼", true)
         }
         CustomButton("登入", modifier = Modifier.fillMaxWidth()) {
             scope.launch {
