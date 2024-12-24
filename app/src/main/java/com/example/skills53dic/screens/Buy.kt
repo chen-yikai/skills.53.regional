@@ -320,7 +320,7 @@ fun TicketDetail(
         DatePickerDialog(onDismissRequest = { showDatePicker.value = false }, confirmButton = {
             Button(onClick = {
                 val milliseconds = datePickerState.selectedDateMillis
-                val userFormat = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
+                val userFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
                 val tempSelectDate = dateFormat.format(Date(milliseconds!!))
                 if (tempSelectDate < today) {
                     toast("請輸入今日以後的日期", context)

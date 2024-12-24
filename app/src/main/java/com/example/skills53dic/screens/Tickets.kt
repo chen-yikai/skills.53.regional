@@ -82,7 +82,7 @@ fun Tickets(nav: NavController = rememberNavController(), db: TicketsViewModel =
                                 LightGrayText(it.name, weight = FontWeight.Bold)
                                 LightGrayText(it.id, size = 15.sp)
                                 Sh(5.dp)
-                                LightGrayText(it.date, size = 13.sp)
+                                LightGrayText(it.date.replace(".", "/"), size = 13.sp)
                             }
                             Column(
                                 modifier = Modifier.align(Alignment.BottomEnd),
