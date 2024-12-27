@@ -93,7 +93,7 @@ fun NavHoster(
                     .fillMaxSize()
                     .background(Color.White)
             ) {
-                NavHost(navController = navController, startDestination = "signin") {
+                NavHost(navController = navController, startDestination = "home") {
                     composable("home") {
                         Home(navController, mediaCenterDetailViewModel)
                     }

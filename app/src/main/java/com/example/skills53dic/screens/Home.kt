@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -62,6 +63,7 @@ import com.example.skills53dic.components.LightGrayText
 import com.example.skills53dic.components.SafeColumn
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun Home(nav: NavController, mediaCenterDetailViewModel: MediaCenterDetailViewModel) {
@@ -177,6 +179,7 @@ fun Gallery() {
         R.drawable.pager_2,
     )
     var pager_state = rememberPagerState { 2 }
+    val scope = rememberCoroutineScope()
 
     Column {
         HorizontalPager(
@@ -205,6 +208,11 @@ fun Gallery() {
                         .height(12.dp)
                         .animateContentSize()
                         .width(if (pager_state.currentPage == i) 35.dp else 12.dp)
+                        .clickable {
+                            scope.launch {
+                                pager_state.animateScrollToPage(i)
+                            }
+                        }
                 )
             }
         }
